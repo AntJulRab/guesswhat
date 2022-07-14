@@ -1,14 +1,6 @@
-# Guesswhat?! models
+# Guesswhat?! models replication 2022 
 
-This repo aims at reproducing the results from the series of GuessWhat?! papers, namely:
-- GuessWhat?! Visual object discovery through multi-modal dialogue [1](https://arxiv.org/abs/1611.08481)
-- End-to-end optimization of goal-driven and visually grounded dialogue systems [2](https://arxiv.org/abs/1703.05423)
-
-The code was equally developed by Florian Strub (University of Lille) and Harm de Vries (University of Montreal) and it is part of the CHISTERA - IGLU Project.
-
-[This branch](https://github.com/GuessWhatGame/guesswhat/tree/refacto_v2) contains a more advanced codebase and multiple baselines.
-
-**WARNING: After refactoring the code of the original paper, we fixed a bug in the codebase (the last generated question was ignored in some cases). New scores are greatly above the scores reported in [1] but some results analysis are now obsolete (qgen stop learning to stop, greedy has the highest accuracy). We apologize for the inconvenience.**
+This repository was set up to keep track of code changes and instructions for replicating the results of de Vries (2016) and Strub (2017) as part of the research project Language Vision and interaction at Potsdam University in 2022.
 
 ## Introduction
 
@@ -125,6 +117,15 @@ To launch the experiments in the local directory, you first have to set the pyht
 export PYTHONPATH=src:${PYTHONPATH} 
 ```
 Note that you can also directly execute the experiments in the source folder.
+
+When working with conda environments this can be done with:
+```
+conda develop /ABSOLUTE_PATH/src
+```
+To check if sc is in he path run:
+```
+python -c "import sys; print('\n'.join(sys.path))"
+```
 
 ### Process Data
 
