@@ -199,6 +199,14 @@ After training, we obtained the following results:
 | Valid     | 0.155 | 20.6% |
 | Test      | 0.157 | 21.1% |
 
+#### Replication 2022
+
+| Set       | Loss   | Error |
+| --------  |:-----:| -----:|
+| Train     | 0.132 | 17.6% |
+| Valid     | 0.156 | 21.1% |
+| Test      | 0.155 | 21.1% |
+
 
 ### Train Guesser
 ```
