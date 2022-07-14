@@ -122,7 +122,7 @@ When working with conda environments this can be done with:
 ```
 conda develop /ABSOLUTE_PATH/src
 ```
-To check if sc is in he path run:
+To check if src is in he path run:
 ```
 python -c "import sys; print('\n'.join(sys.path))"
 ```
