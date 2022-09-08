@@ -83,14 +83,14 @@ if __name__ == '__main__':
 
     # Build Optimizer
     logger.info('Building optimizer..')
-    optimizer, outputs = create_optimizer(network, config['optimizer'], finetune=finetune)
+    optimizer, outputs = create_optimizer(network, config, finetune=finetune)
 
     ###############################
     #  START  TRAINING
     #############################
 
     # create a saver to store/load checkpoint
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
     resnet_saver = None
 
     # Retrieve only resnet variabes
@@ -99,14 +99,14 @@ if __name__ == '__main__':
 
     # CPU/GPU option
     cpu_pool = Pool(args.no_thread, maxtasksperchild=1000)
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=args.gpu_ratio)
+    gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=args.gpu_ratio)
 
-    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True)) as sess:
+    with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True)) as sess:
 
         sources = network.get_sources(sess)
         logger.info("Sources: " + ', '.join(sources))
 
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         if use_resnet:
             resnet_saver.restore(sess, os.path.join(args.data_dir, 'resnet_v1_{}.ckpt'.format(resnet_version)))
 

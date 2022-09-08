@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     # Build Optimizer
     logger.info('Building optimizer..')
-    optimizer, outputs = create_optimizer(network, config['optimizer'])
+    optimizer, outputs = create_optimizer(network, config)
 
     ###############################
     #  START  TRAINING
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     no_epoch = config["optimizer"]["no_epoch"]
 
     # create a saver to store/load checkpoint
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
 
     # Retrieve only resnet variabes
     if use_resnet:
@@ -94,14 +94,14 @@ if __name__ == '__main__':
 
     # CPU/GPU option
     cpu_pool = Pool(args.no_thread, maxtasksperchild=1000)
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=args.gpu_ratio)
+    gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=args.gpu_ratio)
 
-    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True)) as sess:
+    with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True)) as sess:
 
         sources = network.get_sources(sess)
         logger.info("Sources: " + ', '.join(sources))
 
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         start_epoch = load_checkpoint(sess, saver, args, save_path)
 
         best_val_err = 0

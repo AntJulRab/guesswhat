@@ -10,14 +10,14 @@ class OracleNetwork(ResnetModel):
     def __init__(self, config, num_words, device='', reuse=False):
         ResnetModel.__init__(self, "oracle", device=device)
 
-        with tf.variable_scope(self.scope_name, reuse=reuse) as scope:
+        with tf.compat.v1.variable_scope(self.scope_name, reuse=reuse) as scope:
             embeddings = []
             self.batch_size = None
 
             # QUESTION
-            self._is_training = tf.placeholder(tf.bool, name="is_training")
-            self._question = tf.placeholder(tf.int32, [self.batch_size, None], name='question')
-            self._seq_length = tf.placeholder(tf.int32, [self.batch_size], name='seq_length')
+            self._is_training = tf.compat.v1.placeholder(tf.bool, name="is_training")
+            self._question = tf.compat.v1.placeholder(tf.int32, [self.batch_size, None], name='question')
+            self._seq_length = tf.compat.v1.placeholder(tf.int32, [self.batch_size], name='seq_length')
 
             word_emb = utils.get_embedding(self._question,
                                            n_words=num_words,
@@ -31,7 +31,7 @@ class OracleNetwork(ResnetModel):
 
             # CATEGORY
             if config['inputs']['category']:
-                self._category = tf.placeholder(tf.int32, [self.batch_size], name='category')
+                self._category = tf.compat.v1.placeholder(tf.int32, [self.batch_size], name='category')
 
                 cat_emb = utils.get_embedding(self._category,
                                               int(config['model']['category']["n_categories"]) + 1,  # we add the unkwon category
@@ -42,14 +42,14 @@ class OracleNetwork(ResnetModel):
 
             # SPATIAL
             if config['inputs']['spatial']:
-                self._spatial = tf.placeholder(tf.float32, [self.batch_size, 8], name='spatial')
+                self._spatial = tf.compat.v1.placeholder(tf.float32, [self.batch_size, 8], name='spatial')
                 embeddings.append(self._spatial)
                 print("Input: Spatial")
 
 
             # IMAGE
             if config['inputs']['image']:
-                self._image = tf.placeholder(tf.float32, [self.batch_size] + config['model']['image']["dim"], name='image')
+                self._image = tf.compat.v1.placeholder(tf.float32, [self.batch_size] + config['model']['image']["dim"], name='image')
                 self.image_out = get_image_features(
                     image=self._image, question=lstm_states,
                     is_training=self._is_training,
@@ -61,7 +61,7 @@ class OracleNetwork(ResnetModel):
 
             # CROP
             if config['inputs']['crop']:
-                self._crop = tf.placeholder(tf.float32, [self.batch_size] + config['model']['crop']["dim"], name='crop')
+                self._crop = tf.compat.v1.placeholder(tf.float32, [self.batch_size] + config['model']['crop']["dim"], name='crop')
                 self.crop_out = get_image_features(
                     image=self._crop, question=lstm_states,
                     is_training=self._is_training,
@@ -77,17 +77,17 @@ class OracleNetwork(ResnetModel):
 
             # OUTPUT
             num_classes = 3
-            self._answer = tf.placeholder(tf.float32, [self.batch_size, num_classes], name='answer')
+            self._answer = tf.compat.v1.placeholder(tf.float32, [self.batch_size, num_classes], name='answer')
 
-            with tf.variable_scope('mlp'):
+            with tf.compat.v1.variable_scope('mlp'):
                 num_hiddens = config['model']['MLP']['num_hiddens']
                 l1 = utils.fully_connected(emb, num_hiddens, activation='relu', scope='l1')
 
                 self.pred = utils.fully_connected(l1, num_classes, activation='softmax', scope='softmax')
-                self.best_pred = tf.argmax(self.pred, axis=1)
+                self.best_pred = tf.argmax(input=self.pred, axis=1)
 
-            self.loss = tf.reduce_mean(utils.cross_entropy(self.pred, self._answer))
-            self.error = tf.reduce_mean(utils.error(self.pred, self._answer))
+            self.loss = tf.reduce_mean(input_tensor=utils.cross_entropy(self.pred, self._answer))
+            self.error = tf.reduce_mean(input_tensor=utils.error(self.pred, self._answer))
 
             print('Model... Oracle build!')
 

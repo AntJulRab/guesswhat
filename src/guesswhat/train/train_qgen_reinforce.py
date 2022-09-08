@@ -44,7 +44,7 @@ if __name__ == '__main__':
     parser.add_argument("-qgen_identifier", type=str, required=True, help='Qgen identifier')
     parser.add_argument("-guesser_identifier", type=str, required=True, help='Guesser identifier')
 
-    parser.add_argument("-continue_exp", type=bool, default=True, help="Continue previously started experiment?")
+    parser.add_argument("-continue_exp", type=bool, default=False, help="Continue previously started experiment?")
     #parser.add_argument("-from_checkpoint", type=str, help="Start from checkpoint?")
     parser.add_argument("-skip_training",  type=lambda x: bool(strtobool(x)), default="False", help="Start from checkpoint?")
     parser.add_argument("-evaluate_all", type=lambda x: bool(strtobool(x)), default="False", help="Evaluate sampling, greedy and BeamSearch?")  #TODO use an input list
@@ -96,18 +96,18 @@ if __name__ == '__main__':
     logger.info('Building networks..')
 
     qgen_network = QGenNetworkLSTM(qgen_config["model"], num_words=tokenizer.no_words, policy_gradient=True)
-    qgen_var = [v for v in tf.global_variables() if "qgen" in v.name] # and 'rl_baseline' not in v.name
-    qgen_saver = tf.train.Saver(var_list=qgen_var)
+    qgen_var = [v for v in tf.compat.v1.global_variables() if "qgen" in v.name] # and 'rl_baseline' not in v.name
+    qgen_saver = tf.compat.v1.train.Saver(var_list=qgen_var)
 
     oracle_network = OracleNetwork(oracle_config, num_words=tokenizer.no_words)
-    oracle_var = [v for v in tf.global_variables() if "oracle" in v.name]
-    oracle_saver = tf.train.Saver(var_list=oracle_var)
+    oracle_var = [v for v in tf.compat.v1.global_variables() if "oracle" in v.name]
+    oracle_saver = tf.compat.v1.train.Saver(var_list=oracle_var)
 
     guesser_network = GuesserNetwork(guesser_config["model"], num_words=tokenizer.no_words)
-    guesser_var = [v for v in tf.global_variables() if "guesser" in v.name]
-    guesser_saver = tf.train.Saver(var_list=guesser_var)
+    guesser_var = [v for v in tf.compat.v1.global_variables() if "guesser" in v.name]
+    guesser_saver = tf.compat.v1.train.Saver(var_list=guesser_var)
 
-    loop_saver = tf.train.Saver(allow_empty=False)
+    loop_saver = tf.compat.v1.train.Saver(allow_empty=False)
 
     ###############################
     #  REINFORCE OPTIMIZER
@@ -115,16 +115,16 @@ if __name__ == '__main__':
 
     logger.info('Building optimizer..')
 
-    pg_variables = [v for v in tf.trainable_variables() if "qgen" in v.name and 'rl_baseline' not in v.name]
-    baseline_variables = [v for v in tf.trainable_variables() if "qgen" in v.name and 'rl_baseline' in v.name]
+    pg_variables = [v for v in tf.compat.v1.trainable_variables() if "qgen" in v.name and 'rl_baseline' not in v.name]
+    baseline_variables = [v for v in tf.compat.v1.trainable_variables() if "qgen" in v.name and 'rl_baseline' in v.name]
 
-    pg_optimize, _ = create_optimizer(qgen_network, loop_config["optimizer"],
+    pg_optimize, _ = create_optimizer(qgen_network, loop_config,
                                    var_list=pg_variables,
-                                   optim_cst=tf.train.GradientDescentOptimizer,
+                                   optim_cst=tf.compat.v1.train.GradientDescentOptimizer,
                                    loss=qgen_network.policy_gradient_loss)
-    baseline_optimize, _= create_optimizer(qgen_network, loop_config["optimizer"],
+    baseline_optimize, _= create_optimizer(qgen_network, loop_config,
                                         var_list=baseline_variables,
-                                        optim_cst=tf.train.GradientDescentOptimizer,
+                                        optim_cst=tf.compat.v1.train.GradientDescentOptimizer,
                                         apply_update_ops=False,
                                         loss=qgen_network.baseline_loss)
 
@@ -144,24 +144,24 @@ if __name__ == '__main__':
         mode_to_evaluate = ["greedy", "sampling", "beam_search"]
 
     # create a saver to store/load checkpoint
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
 
     # CPU/GPU option
     cpu_pool = Pool(args.no_thread, maxtasksperchild=1000)
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=args.gpu_ratio)
+    gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=args.gpu_ratio)
 
-    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+    with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options)) as sess:
 
         ###############################
         #  LOAD PRE-TRAINED NETWORK
         #############################
 
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         if args.continue_exp: # TODO only reload qgen ckpt
             qgen_saver.restore(sess, save_path.format('params.ckpt'))
         else:
-            qgen_var_supervized = [v for v in tf.global_variables() if "qgen" in v.name and 'rl_baseline' not in v.name] 
-            qgen_loader_supervized = tf.train.Saver(var_list=qgen_var_supervized)
+            qgen_var_supervized = [v for v in tf.compat.v1.global_variables() if "qgen" in v.name and 'rl_baseline' not in v.name] 
+            qgen_loader_supervized = tf.compat.v1.train.Saver(var_list=qgen_var_supervized)
             qgen_loader_supervized.restore(sess, os.path.join(args.networks_dir, 'qgen', args.qgen_identifier, 'params.ckpt'))
 
         oracle_saver.restore(sess, os.path.join(args.networks_dir, 'oracle', args.oracle_identifier, 'params.ckpt'))

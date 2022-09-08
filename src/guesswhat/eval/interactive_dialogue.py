@@ -99,9 +99,9 @@ if __name__ == '__main__':
     #############################
 
     # CPU/GPU option
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=args.gpu_ratio)
+    gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=args.gpu_ratio)
 
-    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+    with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options)) as sess:
 
         ###############################
         #  LOAD NETWORKS
@@ -111,8 +111,8 @@ if __name__ == '__main__':
             oracle_config = get_config_from_xp(os.path.join(args.networks_dir, "oracle"), args.oracle_identifier)
 
             oracle_network = OracleNetwork(oracle_config, num_words=tokenizer.no_words)
-            oracle_var = [v for v in tf.global_variables() if "oracle" in v.name]
-            oracle_saver = tf.train.Saver(var_list=oracle_var)
+            oracle_var = [v for v in tf.compat.v1.global_variables() if "oracle" in v.name]
+            oracle_saver = tf.compat.v1.train.Saver(var_list=oracle_var)
 
             oracle_saver.restore(sess, os.path.join(args.networks_dir, 'oracle', args.oracle_identifier, 'params.ckpt'))
 
@@ -126,8 +126,8 @@ if __name__ == '__main__':
             guesser_config = get_config_from_xp(os.path.join(args.networks_dir, "guesser"), args.guesser_identifier)
 
             guesser_network = GuesserNetwork(guesser_config["model"], num_words=tokenizer.no_words)
-            guesser_var = [v for v in tf.global_variables() if "guesser" in v.name]
-            guesser_saver = tf.train.Saver(var_list=guesser_var)
+            guesser_var = [v for v in tf.compat.v1.global_variables() if "guesser" in v.name]
+            guesser_saver = tf.compat.v1.train.Saver(var_list=guesser_var)
 
             guesser_saver.restore(sess, os.path.join(args.networks_dir, 'guesser', args.guesser_identifier, 'params.ckpt'))
 
@@ -141,8 +141,8 @@ if __name__ == '__main__':
             qgen_config = get_config_from_xp(os.path.join(args.networks_dir, "qgen"), args.qgen_identifier)
 
             qgen_network = QGenNetworkLSTM(qgen_config["model"], num_words=tokenizer.no_words, policy_gradient=False)
-            qgen_var = [v for v in tf.global_variables() if "qgen" in v.name]  # and 'rl_baseline' not in v.name
-            qgen_saver = tf.train.Saver(var_list=qgen_var)
+            qgen_var = [v for v in tf.compat.v1.global_variables() if "qgen" in v.name]  # and 'rl_baseline' not in v.name
+            qgen_saver = tf.compat.v1.train.Saver(var_list=qgen_var)
 
             qgen_saver.restore(sess, os.path.join(args.networks_dir, 'qgen', args.qgen_identifier, 'params.ckpt'))
 

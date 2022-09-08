@@ -26,7 +26,7 @@ def unloop_beam_serie(cur_beam):
 
 def create_initial_beam(decoder_state_size, batch_size=1):
 
-    decoder_state = tf.contrib.rnn.LSTMStateTuple(
+    decoder_state = tf.nn.rnn_cell.LSTMStateTuple(
         c=np.zeros((1, decoder_state_size)),
         h=np.zeros((1, decoder_state_size))
     )

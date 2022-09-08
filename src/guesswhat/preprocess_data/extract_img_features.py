@@ -54,7 +54,7 @@ else:
 
 # define the image loader (raw vs crop)
 if args.mode == "img":
-    images = tf.placeholder(tf.float32, [None, args.img_size, args.img_size, 3], name='image')
+    images = tf.compat.v1.placeholder(tf.float32, [None, args.img_size, args.img_size, 3], name='image')
     source = 'image'
     crop_builder=None
     dataset_cstor = OracleDataset.load
@@ -64,7 +64,7 @@ if args.mode == "img":
                                     channel=channel_mean)
 
 elif args.mode == "crop":
-    images = tf.placeholder(tf.float32, [None, args.img_size, args.img_size, 3], name='crop')
+    images = tf.compat.v1.placeholder(tf.float32, [None, args.img_size, args.img_size, 3], name='crop')
     source = 'crop'
     image_builder = None
     dataset_cstor = CropDataset.load
