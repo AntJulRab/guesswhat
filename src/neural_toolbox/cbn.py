@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
-from tensorflow.contrib.layers.python.layers import utils as tf_utils
+from tf_slim.layers import utils as tf_utils
 from tensorflow.python.training import moving_averages
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import control_flow_ops
@@ -37,8 +37,8 @@ class ConditionalBatchNorm(object):
         # Set variable scope similar to Slim resnet
         # such that the *same* variables are fetched when a pretrained Resnet is loaded
         with tf.compat.v1.variable_scope("BatchNorm"):
-            betas = tf.compat.v1.get_variable("beta", [num_feature_maps], dtype=tf.float32)
-            gammas = tf.compat.v1.get_variable("gamma", [num_feature_maps], dtype=tf.float32)
+            betas = tf.compat.v1.get_variable("beta", [num_feature_maps], dtype=tf.float32, use_resource=False)
+            gammas = tf.compat.v1.get_variable("gamma", [num_feature_maps], dtype=tf.float32, use_resource=False)
 
         betas = tf.tile(tf.expand_dims(betas, 0), tf.stack([batch_size, 1]))
         gammas = tf.tile(tf.expand_dims(gammas, 0), tf.stack([batch_size, 1]))
@@ -90,8 +90,8 @@ def batch_norm(input, gammas, betas, epsilon, is_training):
 
     # use cbn input score to not initialize the variable with resnet values
     with tf.compat.v1.variable_scope("cbn_input"):
-        moving_mean = tf.compat.v1.get_variable("moving_mean", [num_channels], dtype=tf.float32, trainable=False)
-        moving_variance = tf.compat.v1.get_variable("moving_variance", [num_channels], dtype=tf.float32, trainable=False)
+        moving_mean = tf.compat.v1.get_variable("moving_mean", [num_channels], dtype=tf.float32, trainable=False, use_resource=False)
+        moving_variance = tf.compat.v1.get_variable("moving_variance", [num_channels], dtype=tf.float32, trainable=False, use_resource=False)
 
     def _training():
         """

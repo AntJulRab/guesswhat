@@ -10,7 +10,7 @@ def get_embedding(lookup_indices, n_words, n_dim,
         with tf.control_dependencies([tf.compat.v1.assert_non_negative(n_words - tf.reduce_max(input_tensor=lookup_indices))]):
             embedding_matrix = tf.compat.v1.get_variable(
                 'W', [n_words, n_dim],
-                initializer=tf.compat.v1.random_uniform_initializer(-0.08, 0.08))
+                initializer=tf.compat.v1.random_uniform_initializer(-0.08, 0.08),use_resource=False)
             embedded = tf.nn.embedding_lookup(params=embedding_matrix, ids=lookup_indices)
             return embedded
 
@@ -23,13 +23,13 @@ def fully_connected(inp, n_out, activation=None, scope="fully_connected",
         shape = [inp_size, n_out]
         weight = tf.compat.v1.get_variable(
             "W", shape,
-            initializer=weight_initializer)
+            initializer=weight_initializer, use_resource=False)
         out = tf.matmul(inp, weight)
 
         if use_bias:
             bias = tf.compat.v1.get_variable(
                 "b", [n_out],
-                initializer=Constant(init_bias))
+                initializer=Constant(init_bias), use_resource=False)
             out += bias
 
     if activation == 'relu':

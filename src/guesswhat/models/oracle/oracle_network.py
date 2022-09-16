@@ -9,7 +9,8 @@ class OracleNetwork(ResnetModel):
 
     def __init__(self, config, num_words, device='', reuse=False):
         ResnetModel.__init__(self, "oracle", device=device)
-
+        
+        tf.compat.v1.disable_eager_execution()
         with tf.compat.v1.variable_scope(self.scope_name, reuse=reuse) as scope:
             embeddings = []
             self.batch_size = None

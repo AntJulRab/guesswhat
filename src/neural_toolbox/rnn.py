@@ -1,4 +1,5 @@
 import tensorflow as tf
+import tensorflow_addons as tfa
 
 
 # For some reason, it is faster than MultiCell on tf
@@ -12,7 +13,7 @@ def variable_length_LSTM(inp, num_hidden, seq_length,
         for d in range(depth):
             with tf.compat.v1.variable_scope('lstmcell'+str(d)):
 
-                cell = tf.contrib.rnn.LayerNormBasicLSTMCell(
+                cell = tfa.rnn.LayerNormLSTMCell(
                     num_hidden,
                     layer_norm=layer_norm,
                     dropout_keep_prob=dropout_keep_prob,

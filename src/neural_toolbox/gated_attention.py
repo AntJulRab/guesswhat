@@ -1,4 +1,5 @@
 import tensorflow as tf
+import tf_slim as slim
 
 
 # https://arxiv.org/pdf/1606.01549.pdf
@@ -33,7 +34,7 @@ def gated_film(features, context, use_beta=True, use_softmax=False, keep_dropout
     no_params = 1 if use_beta else 2
 
     context = tf.nn.dropout(context, 1 - (keep_dropout))
-    film_params = tf.contrib.layers.fully_connected(context,
+    film_params = slim.layers.fully_connected(context,
                                        num_outputs=no_params * feature_size,
                                        activation_fn=None,
                                        reuse=reuse,

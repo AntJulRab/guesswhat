@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.python.ops import control_flow_ops
-import tensorflow.contrib.layers as tfc_layers
+import tf_slim as slim
 
 def create_optimizer(network, config, finetune=list(), optim_cst=tf.compat.v1.train.AdamOptimizer, var_list=None, apply_update_ops=True, loss=None):
 
@@ -106,9 +106,9 @@ def l2_regularization(params, weight_decay, weight_decay_remove=list()):
     with tf.compat.v1.variable_scope("l2_normalization"):
         params = [v for v in params if
                       not any([(needle in v.name) for needle in weight_decay_remove])]
-        regularizer = tfc_layers.l2_regularizer(scale=weight_decay)
+        regularizer = slim.l2_regularizer(scale=weight_decay)
 
-        return tfc_layers.apply_regularization(regularizer, weights_list=params)
+        return slim.apply_regularization(regularizer, weights_list=params)
 
 def average_gradient(tower_grads):
     """Calculate the average gradient for each shared variable across all towers.

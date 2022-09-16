@@ -120,7 +120,7 @@ if __name__ == '__main__':
             if valid_loss < best_val_loss:
                 best_train_loss = train_loss
                 best_val_loss = valid_loss
-                saver.save(sess, save_path.format('params.ckpt'))
+                saver.save(sess, save_path.format('params.ckpt'),save_format='h5')
                 logger.info("Guesser checkpoint saved...")
 
                 pickle_dump({'epoch': t}, save_path.format('status.pkl'))

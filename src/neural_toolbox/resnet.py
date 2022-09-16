@@ -1,10 +1,10 @@
 import tensorflow as tf
-import tensorflow.contrib.slim as slim
-import tensorflow.contrib.slim.python.slim.nets.resnet_v1 as resnet_v1
-import tensorflow.contrib.slim.python.slim.nets.resnet_utils as slim_utils
+import tf_slim as slim
+import tf_slim.nets.resnet_v1 as resnet_v1
+import tf_slim.nets.resnet_utils as slim_utils
 
-from tensorflow.contrib import layers as layers_lib
-from tensorflow.contrib.framework.python.ops import arg_scope
+from tf_slim import layers as layers_lib
+from tf_slim import arg_scope
 import os
 
 def get_resnet_arg_scope(bn_fn):
