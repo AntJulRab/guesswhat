@@ -244,7 +244,7 @@ if __name__ == '__main__':
             if val_score > final_val_score:
                 logger.info("Save checkpoint...")
                 final_val_score = val_score
-                loop_saver.save(sess, save_path.format('params.ckpt'),save_format='h5')
+                loop_saver.save(sess, save_path.format('params.ckpt'))
 
 
         # Compute the test score with early stopping

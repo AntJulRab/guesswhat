@@ -134,7 +134,7 @@ if __name__ == '__main__':
             if valid_accuracy > best_val_err:
                 best_train_err = train_accuracy
                 best_val_err = valid_accuracy
-                saver.save(sess, save_path.format('params.ckpt'),save_format='h5')
+                saver.save(sess, save_path.format('params.ckpt'))
                 logger.info("Guesser checkpoint saved...")
 
                 pickle_dump({'epoch': t}, save_path.format('status.pkl'))
