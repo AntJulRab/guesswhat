@@ -58,7 +58,8 @@ if __name__ == '__main__':
 
         assert False, "Guesser + Image is not yet available"
 
-
+    tf.compat.v1.disable_eager_execution()
+    
     # Load data
     logger.info('Loading data..')
     trainset = Dataset(args.data_dir, "train", image_builder, crop_builder)
@@ -80,6 +81,8 @@ if __name__ == '__main__':
     ###############################
     #  START  TRAINING
     #############################
+    
+
 
     # Load config
     batch_size = config['optimizer']['batch_size']
@@ -95,6 +98,7 @@ if __name__ == '__main__':
     # CPU/GPU option
     cpu_pool = Pool(args.no_thread, maxtasksperchild=1000)
     gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=args.gpu_ratio)
+   
 
     with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True)) as sess:
 

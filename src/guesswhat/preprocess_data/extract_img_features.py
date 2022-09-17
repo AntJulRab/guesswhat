@@ -7,10 +7,10 @@ from distutils.util import strtobool
 
 from neural_toolbox import resnet
 
-import tensorflow.contrib.slim as slim
-import tensorflow.contrib.slim.python.slim.nets.vgg as vgg
-import tensorflow.contrib.slim.python.slim.nets.resnet_v1 as resnet_v1
-import tensorflow.contrib.slim.python.slim.nets.resnet_utils as slim_utils
+import tf_slim as slim
+import tf_slim.python.slim.nets.vgg as vgg
+import tf_slim.python.slim.nets.resnet_v1 as resnet_v1
+import tf_slim.python.slim.nets.resnet_utils as slim_utils
 
 from generic.data_provider.image_loader import RawImageBuilder, RawCropBuilder
 from generic.preprocess_data.extract_img_features import extract_features

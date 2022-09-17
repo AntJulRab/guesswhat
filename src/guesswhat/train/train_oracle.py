@@ -88,6 +88,10 @@ if __name__ == '__main__':
     ###############################
     #  START  TRAINING
     #############################
+    
+    print('flag')
+    
+    tf.compat.v1.disable_eager_execution()
 
     # create a saver to store/load checkpoint
     saver = tf.compat.v1.train.Saver()
