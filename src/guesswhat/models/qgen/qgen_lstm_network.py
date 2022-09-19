@@ -1,4 +1,6 @@
 import tensorflow as tf
+import tf_slim as slim
+import tensorflow_addons as tfa
 
 from neural_toolbox import utils\
 
@@ -36,7 +38,7 @@ class QGenNetworkLSTM(AbstractNetwork):
 
             self.decoder_zero_state_c = tf.compat.v1.placeholder_with_default(zero_state, [mini_batch_size, config['num_lstm_units']], name="state_c")
             self.decoder_zero_state_h = tf.compat.v1.placeholder_with_default(zero_state, [mini_batch_size, config['num_lstm_units']], name="state_h")
-            decoder_initial_state = tf.nn.rnn_cell.LSTMStateTuple(c=self.decoder_zero_state_c, h=self.decoder_zero_state_h)
+            decoder_initial_state = tf.compat.v1.nn.rnn_cell.LSTMStateTuple(c=self.decoder_zero_state_c, h=self.decoder_zero_state_h)
 
             # Misc
             self.is_training = tf.compat.v1.placeholder(tf.bool, name='is_training')
@@ -85,11 +87,9 @@ class QGenNetworkLSTM(AbstractNetwork):
 
 
             # encode one word+image
-            decoder_lstm_cell = tf.contrib.rnn.LayerNormBasicLSTMCell(
+            decoder_lstm_cell = tf.compat.v1.nn.rnn_cell.LSTMCell(
                     config['num_lstm_units'],
-                    layer_norm=False,
-                    dropout_keep_prob=1.0,
-                    reuse=reuse)
+                    reuse=False)
 
 
             self.decoder_output, self.decoder_state = tf.compat.v1.nn.dynamic_rnn(
@@ -213,13 +213,9 @@ class QGenNetworkLSTM(AbstractNetwork):
 
                 inp_emb = tf.concat([word_emb, self.image_emb], axis=1)
                 with tf.compat.v1.variable_scope("word_decoder"):
-                    lstm_cell = tf.contrib.rnn.LayerNormBasicLSTMCell(
-                        config['num_lstm_units'],
-                        layer_norm=False,
-                        dropout_keep_prob=1.0,
-                        reuse=True)
+                    lstm_cell = tf.compat.v1.nn.rnn_cell.LSTMCell(config['num_lstm_units'], reuse=False)
 
-                    state = tf.nn.rnn_cell.LSTMStateTuple(c=prev_state_c, h=prev_state_h)
+                    state = tf.compat.v1.nn.rnn_cell.LSTMStateTuple(c=prev_state_c, h=prev_state_h)
                     out, state = lstm_cell(inp_emb, state)
 
                     # store/update the state when the dialogue is not finished (after sampling the <?> token)

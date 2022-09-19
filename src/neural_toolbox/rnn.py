@@ -12,9 +12,10 @@ def variable_length_LSTM(inp, num_hidden, seq_length,
         rnn_states = inp
         for d in range(depth):
             with tf.compat.v1.variable_scope('lstmcell'+str(d)):
+            
+              
 
-                cell = tfa.rnn.LayerNormLSTMCell(
-                    num_hidden, dropout=1-dropout_keep_prob)
+                cell = tf.compat.v1.nn.rnn_cell.LSTMCell(num_hidden, reuse=reuse)
 
                 rnn_states, rnn_last_states = tf.compat.v1.nn.dynamic_rnn(
                     cell,
@@ -25,7 +26,7 @@ def variable_length_LSTM(inp, num_hidden, seq_length,
                 print(rnn_last_states)
                 print(rnn_states)
                 states.append(rnn_states)
-                last_states.append(rnn_last_states[1])
+                last_states.append(rnn_last_states.h)
 
         states = tf.concat(states, axis=2)
         last_states = tf.concat(last_states, axis=1)

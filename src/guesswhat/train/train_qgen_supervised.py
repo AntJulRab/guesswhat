@@ -45,6 +45,8 @@ if __name__ == '__main__':
     ###############################
     #  LOAD DATA
     #############################
+    
+    tf.compat.v1.disable_eager_execution()
 
     # Load image
     logger.info('Loading images..')
