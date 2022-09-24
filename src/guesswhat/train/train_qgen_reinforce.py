@@ -94,6 +94,8 @@ if __name__ == '__main__':
     #############################
 
     logger.info('Building networks..')
+    
+    tf.compat.v1.disable_eager_execution()
 
     qgen_network = QGenNetworkLSTM(qgen_config["model"], num_words=tokenizer.no_words, policy_gradient=True)
     qgen_var = [v for v in tf.compat.v1.global_variables() if "qgen" in v.name] # and 'rl_baseline' not in v.name
