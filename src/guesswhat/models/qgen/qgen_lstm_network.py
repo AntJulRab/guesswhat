@@ -22,7 +22,12 @@ class QGenNetworkLSTM(AbstractNetwork):
 
             # Image
             self.images = tf.compat.v1.placeholder(tf.float32, [mini_batch_size] + config['image']["dim"], name='images')
+            
+            #
+            self.no_objects = tf.compat.v1.placeholder(tf.int32, [mini_batch_size],name = 'no_objects')
+            #
 
+            
             # Question
             self.dialogues = tf.compat.v1.placeholder(tf.int32, [mini_batch_size, None], name='dialogues')
             self.answer_mask = tf.compat.v1.placeholder(tf.float32, [mini_batch_size, None], name='answer_mask')  # 1 if keep and (1 q/a 1) for (START q/a STOP)
@@ -30,7 +35,7 @@ class QGenNetworkLSTM(AbstractNetwork):
             self.seq_length = tf.compat.v1.placeholder(tf.int32, [mini_batch_size], name='seq_length')
 
             # Rewards
-            self.cum_rewards = tf.compat.v1.placeholder(tf.float32, shape=[mini_batch_size, None], name='cum_reward')
+            self.cum_rewards = tf.compat.v1.placeholder(tf.float32, shape=[mini_batch_size, None], name='cum_reward') #initialize cumulative reward 
 
             # DECODER Hidden state (for beam search)
             zero_state = tf.zeros([1, config['num_lstm_units']])  # default LSTM state is a zero-vector
@@ -133,6 +138,10 @@ class QGenNetworkLSTM(AbstractNetwork):
 
             # Compute policy gradient
             if policy_gradient:
+                
+
+                # we expect answer_mask to be a 0-1 valued list (of length = batch size) containing correct (1) and wrong (0) guesses
+                # by multiplying answer_mask * rewards 
 
                 with tf.compat.v1.variable_scope('rl_baseline'):
                     decoder_out = tf.stop_gradient(self.decoder_output)  # take the LSTM output (and stop the gradient!)
@@ -158,7 +167,7 @@ class QGenNetworkLSTM(AbstractNetwork):
                     self.score_function = tf.multiply(self.log_of_policy, rewards - self.baseline)  # score function
 
                     self.baseline_loss = tf.reduce_sum(input_tensor=tf.square(rewards - self.baseline))
-
+                    
                     self.policy_gradient_loss = tf.reduce_sum(input_tensor=self.score_function, axis=1)  # sum over the dialogue trajectory
                     self.policy_gradient_loss = tf.reduce_mean(input_tensor=self.policy_gradient_loss, axis=0)  # reduce over minibatch dimension
 
