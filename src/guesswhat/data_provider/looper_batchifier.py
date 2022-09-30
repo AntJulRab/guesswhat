@@ -46,7 +46,7 @@ class LooperBatchifier(AbstractBatchifier):
 
             batch['obj_spats'].append(obj_spats)
             batch['obj_cats'].append(obj_cats)
-
+            
             # Pick one random object in the game: TODO clean a bit
             if self.generate_new_games:
                 random_index = random.randint(0, len(game.objects) - 1)
@@ -63,7 +63,7 @@ class LooperBatchifier(AbstractBatchifier):
             batch['targets_spatial'].append(obj_spats[random_index])
             batch['targets_category'].append(obj_cats[random_index])
 
-            batch['debug'].append((target_object.category, (target_object.bbox.x_center, target_object.bbox.y_center), game.image.url))
+            batch['debug'].append((target_object.category, (target_object.bbox.x_center, target_object.bbox.y_center), game.image.url),game.no_objects)
 
             # image
             img = game.image.get_image()

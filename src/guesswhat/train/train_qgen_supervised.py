@@ -108,13 +108,29 @@ if __name__ == '__main__':
                                       batch_size=batch_size, pool=cpu_pool,
                                       batchifier=batchifier,
                                       shuffle=True)
+
+            print("The args are ,", sess,train_iterator,batch_size,outputs)  
             [train_loss, _] = evaluator.process(sess, train_iterator, outputs=outputs + [optimizer])
+            #train_loss,train_accuracy = evaluator.process(sess, train_iterator, outputs=outputs + [optimizer])
 
             valid_iterator = Iterator(validset, pool=cpu_pool,
                                       batch_size=batch_size*2,
+                                      #batch_size=batch_size,
                                       batchifier=batchifier,
                                       shuffle=False)
-            [valid_loss, _] = evaluator.process(sess, valid_iterator, outputs=outputs)
+
+            
+            print("The args are ,", sess,train_iterator,batch_size,outputs)
+            #print("The shape of OUTPUTS IS ,", outputs.shape(),outputs[0])
+        
+        
+
+            outputs, _ = outputs
+            print(outputs)
+
+        
+            [valid_loss, _] = evaluator.process(sess, valid_iterator, outputs=[outputs])
+            #valid_loss,valid_accuracy = evaluator.process(sess, valid_iterator, outputs=outputs)
 
             logger.info("Training loss: {}".format(train_loss))
             logger.info("Validation loss: {}".format(valid_loss))
@@ -134,5 +150,5 @@ if __name__ == '__main__':
                                  batchifier=batchifier,
                                  shuffle=True)
         [test_loss, _] = evaluator.process(sess, test_iterator, outputs)
-
+        #test_loss,test_accuracy = evaluator.process(sess, test_iterator, outputs)
         logger.info("Testing loss: {}".format(test_loss))

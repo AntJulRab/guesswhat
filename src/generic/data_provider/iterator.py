@@ -55,13 +55,21 @@ class Iterator(object):
 
         # Filtered games
         games = dataset.get_data()
+
+
+        #this is a LIST of Game objects
         games = batchifier.filter(games)
 
         if shuffle:
             random.shuffle(games)
 
         self.n_examples = len(games)
-        self.batch_size = batch_size
+        self.batch_size = batch_size 
+
+        #
+        #self.no_objects = {game_id : games[str(game_id)].no_objects for game_id in games.keys()}
+        #
+        #the no_objects attribute of an Iterator is a dictionary with keys = image id of the game (as in batchifier.filter(games)) and values = the number of the objects in that game
 
         self.n_batches = int(math.ceil(1. * self.n_examples / self.batch_size))
         batch = split_batch(games, batch_size, use_padding)

@@ -2,7 +2,7 @@ import tensorflow as tf
 import tf_slim as slim
 import tensorflow_addons as tfa
 
-from neural_toolbox import utils\
+from neural_toolbox import utils
 
 from generic.tf_factory.attention_factory import get_attention
 from generic.tf_utils.abstract_network import AbstractNetwork

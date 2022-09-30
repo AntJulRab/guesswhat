@@ -15,7 +15,10 @@ class BasicLooper(object):
         self.max_no_question = config['loop']['max_question']
         self.max_depth = config['loop']['max_depth']
         self.k_best = config['loop']['beam_k_best']
-
+        
+        #
+        self.no_objects = 
+        #
         self.oracle = oracle_wrapper
         self.guesser = guesser_wrapper
         self.qgen = qgen_wrapper
@@ -31,13 +34,23 @@ class BasicLooper(object):
         score, total_elem = 0, 0
         for game_data in tqdm(iterator):
 
+            ##HEY: as expected the tokenizer (i.e.GWTokenizer) will return a list of tokens! 
             # initialize the dialogue
             full_dialogues = [np.array([self.tokenizer.start_token]) for _ in range(self.batch_size)]
+
+            # ADD THE COST: for every dialogue in the batch there will be a cost!
+            cost_batch = np.zeros(self.batch_size)
+
+            question_history = {i:[] for i in range(self.batch_size)}
+            #
+
             prev_answers = full_dialogues
 
             prob_objects = []
 
             no_elem = len(game_data["raw"])
+            ##wait, when does game_data get the raw "key"??? afaik it should only exist when the chosen guesser is GuesserUserWrapper and NOT GuesserWrapper
+            
             total_elem += no_elem
 
             # Step 1: generate question/answer
@@ -57,7 +70,21 @@ class BasicLooper(object):
                 # Step 1.3: store the full dialogues
                 for i in range(self.batch_size):
                     full_dialogues[i] = np.concatenate((full_dialogues[i], questions[i], [answers[i]]))
+                    question_history[i].append(questions[i])
 
+
+                ####
+                # Step 1.3.5: check if the questions are repeated
+                if no_questions > 0:
+                    for i in range(self.batch_size):
+                        if question_history[i][no_question]==question_history[i][no_question-1]:
+                            cost_batch[i]+=0
+                        else:
+                            cost_batch[i] += cost(q_k,q_no_question)  ##TODO finish this part bro
+                else:
+                    cost_batch = cost_batch
+                
+                ####
                 # Step 1.4 set new input tokens
                 prev_answers = [[a]for a in answers]
 
@@ -87,12 +114,15 @@ class BasicLooper(object):
                 for i, (d, g, t, f, go, po) in enumerate(zip(full_dialogues, game_data["raw"], game_data["targets_index"], found_object, id_guess_objects, prob_objects)):
                     self.storage.append({"dialogue": d,
                                          "game": g,
+                                         "no_objects" = g.no_objects
                                          "object_id": g.objects[t].id,
                                          "success": f,
                                          "guess_object_id": g.objects[go].id,
                                          "prob_objects" : po} )
 
             if len(optimizer) > 0:
+
+                ####### THIS IS WHERE YOU DEFINE THE REWARD
                 final_reward = found_object + 0  # +1 if found otherwise 0
 
                 self.apply_policy_gradient(sess,

@@ -15,6 +15,12 @@ class GuesserWrapper(object):
     def find_object(self, sess, dialogues, seq_length, game_data):
         game_data["dialogues"] = dialogues
         game_data["seq_length"] = seq_length
+        
+        
+        
+        
+        #### HOW DO WE DEFINE THIS
+        #### game_data["no_objects"] = game_data
 
         # sample
         selected_object, softmax = self.evaluator.execute(sess, output=[self.guesser.selected_object, self.guesser.softmax], batch=game_data)
@@ -46,6 +52,12 @@ class GuesserUserWrapper(object):
         print("Select one of the following objects")
         game = game_data["raw"][0]
         objects = game.objects
+
+        #
+        no_objects = game.no_objects
+        print("The number of objects is", no_objects)
+        #
+
         for i, obj in enumerate(objects):
             print(" -", i, obj.category, "\t", obj.bbox)
 

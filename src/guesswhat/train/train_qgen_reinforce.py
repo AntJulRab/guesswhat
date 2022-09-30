@@ -168,6 +168,9 @@ if __name__ == '__main__':
 
         oracle_saver.restore(sess, os.path.join(args.networks_dir, 'oracle', args.oracle_identifier, 'params.ckpt'))
         guesser_saver.restore(sess, os.path.join(args.networks_dir, 'guesser', args.guesser_identifier, 'params.ckpt'))
+        
+        ################################
+        ################################
 
         # create training tools
         loop_sources = qgen_network.get_sources(sess)

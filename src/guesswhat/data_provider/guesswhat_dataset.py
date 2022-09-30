@@ -48,6 +48,10 @@ class Game:
             if o['id'] == str(object_id):
                 self.object = new_obj  # Keep ref on the object to find
 
+        ##
+        self.no_objects = len(self.objects)
+        ##
+
         self.question_ids = [qa['id'] for qa in qas]
         self.questions = [qa['q'] for qa in qas]
         self.answers = [qa['a'] for qa in qas]
