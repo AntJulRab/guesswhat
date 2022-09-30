@@ -1,7 +1,7 @@
 from tqdm import tqdm
 import numpy as np
-
-
+from guesswhat.models.looper.cost import IOU_dist, cost_fn
+from collections import defaultdict
 from guesswhat.models.looper.tools import clear_after_stop_dialogue, list_to_padded_tokens
 
 
@@ -17,12 +17,12 @@ class BasicLooper(object):
         self.k_best = config['loop']['beam_k_best']
         
         #
-        self.no_objects = 
-        #
         self.oracle = oracle_wrapper
         self.guesser = guesser_wrapper
         self.qgen = qgen_wrapper
 
+    
+    #need to change store_games = True!!!
     def process(self, sess, iterator, mode, optimizer=list(), store_games=False):
 
         # initialize the wrapper
@@ -42,7 +42,14 @@ class BasicLooper(object):
             cost_batch = np.zeros(self.batch_size)
 
             question_history = {i:[] for i in range(self.batch_size)}
-            #
+
+            IOU = {i:defaultdict(dict) for i in range(self.batch_size)}
+            cluster = {i:{j:[] for j in range(self.max_no_question)} for i in range(self.batch_size)}
+            penalty= np.zeros(self.batch_size)
+
+            #HARDCODED PARAMETERS
+            delta = 0.5
+            beta = 1
 
             prev_answers = full_dialogues
 
@@ -56,7 +63,7 @@ class BasicLooper(object):
             # Step 1: generate question/answer
             self.qgen.reset(batch_size=no_elem)
             for no_question in range(self.max_no_question):
-
+                
                 # Step 1.1: Generate new question
                 padded_questions, questions, seq_length = \
                     self.qgen.sample_next_question(sess, prev_answers, game_data=game_data, mode=mode)
@@ -72,19 +79,35 @@ class BasicLooper(object):
                     full_dialogues[i] = np.concatenate((full_dialogues[i], questions[i], [answers[i]]))
                     question_history[i].append(questions[i])
 
+                    #collect the distances in a IOU matrix
+                    for j in range(no_question):
+                        IOU[i][no_question][j] = IOU_dist(question_history[i][no_question],question_history[i][j])  
+                        #IOU[i][j][no_question] = IOU[i][j][no_question]
+                        if IOU[i][no_question][j]<delta:
+                            cluster[i][no_question].append(j)
+
 
                 ####
+
+                # Step 1.3.1: compute the IOU 
                 # Step 1.3.5: check if the questions are repeated
-                if no_questions > 0:
+                if no_question > 0:
                     for i in range(self.batch_size):
-                        if question_history[i][no_question]==question_history[i][no_question-1]:
-                            cost_batch[i]+=0
+                        
+                        #take the k to be the index of the question that gives the highest IOU
+                        k = max(IOU[i][no_question],key=IOU[i][no_question].get)
+
+                        if IOU[i][no_question][k]<delta:
+                            cost_batch[i]+= cost_fn(no_question,k,self.max_no_question,no_question,k)
                         else:
-                            cost_batch[i] += cost(q_k,q_no_question)  ##TODO finish this part bro
+                            cost_batch[i] += beta*(cost_fn(question_history[i][no_question],question_history[i][k],self.max_no_question,no_question,k)
+                            +IOU[i][no_question][k])/2
                 else:
                     cost_batch = cost_batch
                 
                 ####
+
+                #Step 1.3.6: define the new final reward:
                 # Step 1.4 set new input tokens
                 prev_answers = [[a]for a in answers]
 
@@ -114,7 +137,7 @@ class BasicLooper(object):
                 for i, (d, g, t, f, go, po) in enumerate(zip(full_dialogues, game_data["raw"], game_data["targets_index"], found_object, id_guess_objects, prob_objects)):
                     self.storage.append({"dialogue": d,
                                          "game": g,
-                                         "no_objects" = g.no_objects
+                                         "no_objects" : g.no_objects,
                                          "object_id": g.objects[t].id,
                                          "success": f,
                                          "guess_object_id": g.objects[go].id,
@@ -123,7 +146,11 @@ class BasicLooper(object):
             if len(optimizer) > 0:
 
                 ####### THIS IS WHERE YOU DEFINE THE REWARD
-                final_reward = found_object + 0  # +1 if found otherwise 0
+                for i in range(self.batch_size):
+                    max_key = max(cluster[i], key= lambda x: len(cluster[i][x]))
+                    penalty[i] = len(cluster[i][max_key])/self.max_no_question
+
+                final_reward = found_object - penalty  # +1 if found otherwise 0
 
                 self.apply_policy_gradient(sess,
                                            final_reward=final_reward,

@@ -1,4 +1,4 @@
-fimport argparse
+import argparse
 import os
 from multiprocessing import Pool
 import logging
@@ -202,19 +202,19 @@ if __name__ == '__main__':
         logger.info(">>>-------------- INITIAL SCORE ---------------------<<<")
 
         logger.info(">>>  Initial models  <<<")
-        test_model(sess, testset, cpu_pool=cpu_pool, tokenizer=tokenizer,
-                   oracle=oracle_network,guesser=guesser_network, qgen=qgen_network,
-                   batch_size=batch_size*2, logger=logger)
+        #test_model(sess, testset, cpu_pool=cpu_pool, tokenizer=tokenizer,
+        #           oracle=oracle_network,guesser=guesser_network, qgen=qgen_network,
+        #           batch_size=batch_size*2, logger=logger)
 
         logger.info(">>>  New Objects  <<<")
-        compute_qgen_accuracy(sess, trainset, batchifier=train_batchifier, evaluator=looper_evaluator, tokenizer=tokenizer,
-                              mode=mode_to_evaluate, save_path=save_path, cpu_pool=cpu_pool, batch_size=batch_size,
-                              store_games=args.store_games, dump_suffix="init.new_object")
+        #compute_qgen_accuracy(sess, trainset, batchifier=train_batchifier, evaluator=looper_evaluator, tokenizer=tokenizer,
+        #                      mode=mode_to_evaluate, save_path=save_path, cpu_pool=cpu_pool, batch_size=batch_size,
+        #                      store_games=args.store_games, dump_suffix="init.new_object")
 
         logger.info(">>>  New Games  <<<")
-        compute_qgen_accuracy(sess, testset, batchifier=eval_batchifier, evaluator=looper_evaluator, tokenizer=tokenizer,
-                              mode=mode_to_evaluate, save_path=save_path, cpu_pool=cpu_pool, batch_size=batch_size,
-                              store_games=args.store_games, dump_suffix="init.new_games")
+        #compute_qgen_accuracy(sess, testset, batchifier=eval_batchifier, evaluator=looper_evaluator, tokenizer=tokenizer,
+        #                      mode=mode_to_evaluate, save_path=save_path, cpu_pool=cpu_pool, batch_size=batch_size,
+        #                      store_games=args.store_games, dump_suffix="init.new_games")
         logger.info(">>>------------------------------------------------<<<")
 
         if args.skip_training:
