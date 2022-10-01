@@ -95,13 +95,13 @@ class BasicLooper(object):
                     for i in range(self.batch_size):
                         
                         #take the k to be the index of the question that gives the highest IOU
-                        k = max(IOU[i][no_question],key=IOU[i][no_question].get)
+                        k = min(IOU[i][no_question],key=IOU[i][no_question].get)
 
                         if IOU[i][no_question][k]<delta:
-                            cost_batch[i]+= cost_fn(no_question,k,self.max_no_question,no_question,k)
-                        else:
                             cost_batch[i] += beta*(cost_fn(question_history[i][no_question],question_history[i][k],self.max_no_question,no_question,k)
                             +IOU[i][no_question][k])/2
+                        else:
+                            cost_batch = cost_batch
                 else:
                     cost_batch = cost_batch
                 
