@@ -1,5 +1,3 @@
-# Guesswhat?! models
-
 # Guesswhat?! models improved tensorflow 2 version
 This repository was set up to keep track of code changes and instructions for replicating the results of the following papers:
 - GuessWhat?! Visual object discovery through multi-modal dialogue [1] https://arxiv.org/abs/1611.08481
