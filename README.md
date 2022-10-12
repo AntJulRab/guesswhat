@@ -1,17 +1,22 @@
 # Guesswhat?! models
 
-This repo aims at reproducing the results from the series of GuessWhat?! papers, namely:
+# Guesswhat?! models improved tensorflow 2 version
+This repository was set up to keep track of code changes and instructions for replicating the results of the following papers:
 - GuessWhat?! Visual object discovery through multi-modal dialogue [1] https://arxiv.org/abs/1611.08481
 - End-to-end optimization of goal-driven and visually grounded dialogue systems [2] - https://arxiv.org/abs/1703.05423
+as part of the research project Language Vision and interaction at Potsdam University in 2022.
 
-The code was equally developed by Florian Strub (University of Lille) and Harm de Vries (University of Montreal)
+team members:
+-Pier Giorgio Rayme Battisti (piergiorgio.rayme@gmail.com)
+-Ian Clotworthy (clotworthy@uni-potsdam.de)
+-Anton Rabe (rabe@uni-potsdam.de)
 
-The project is part of the CHISTERA - IGLU Project.
+The original version of the code on the master branch was equally developed by Florian Strub (University of Lille) and Harm de Vries (University of Montreal). Several changes had to ba made to allow training the models on GPU under tenorflow version 1.3. That version of the code can be found on the replication branch.
 
-You can also have access to a more advanced codebase with more baselines by using the branch refacto_v2: https://github.com/GuessWhatGame/guesswhat/tree/refacto_v2
+We migrated the code to tensorflow 2 to run under tensorflow-gpu version 2.0.0 on modern operating systems. Furthermore, a penalty term for repetitions in question sequence was introduced. This version of the code can be found on the tensorflow_2 branch.
 
-**WARNING: After refactoring the code of the original paper, we fixed a bug in the codebase (the last generated question was ignored in some cases). New scores are greatly above the scores reported in [1] but some results analysis are now obsolete (qgen stop learning to stop, greedy has the highest accuracy). We apologize for the inconvenience.**
-
+The environment specifications for the tensorflow 2 version of the project can be taken from setup/env.yml on the tensorflow 2 branch.
+You can also have access to more baselines by using the branch refacto_v2: https://github.com/GuessWhatGame/guesswhat/tree/refacto_v2
 
 #### Summary:
 
